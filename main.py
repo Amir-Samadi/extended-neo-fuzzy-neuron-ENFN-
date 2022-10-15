@@ -1,0 +1,51 @@
+from extended_neo_fuzzy_neuron import ENFN
+import argparse
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+import pandas as pd
+dataset_df = pd.read_excel("data.xlsx", index_col=0)
+data = dataset_df["data"]
+
+
+parser = argparse.ArgumentParser(description='extended neo fuzzy neuron')
+parser.add_argument('--membership_functions', type=int, default=6,
+                        help='number of membership_functions (default: 3)')
+parser.add_argument('--membership_function_shape', type=str, default="triangular",
+                        help='membership_function_shape, triangular,trapezoid,guassian,bell,sigmoid')
+parser.add_argument('--learning_rate', type=float, default=0.05,
+                    help='learning_rate, (default: 0.9)')
+parser.add_argument('--inference_order', type=int, default=1, metavar='G',
+                    help='TSK inference_order (default: 0)')
+parser.add_argument('--history_length', type=int, default=6, metavar='G',
+                    help='history_length (default: 10)')
+parser.add_argument('--train_sample_ratio', type=float, default=0.8, metavar='G',
+                    help='history_length (default: 10)')
+
+args = parser.parse_args("")
+enfn = ENFN(args)
+y_train,train_err,train_data = enfn.train(data.values[0:int(data.size*args.train_sample_ratio)])
+y_test,test_err,test_data = enfn.test(data.values[int(data.size*args.train_sample_ratio)-args.history_length:-1])
+
+print("trian MSE:",  (np.square(train_err)).mean(axis=-1))
+print("test MSE:",  (np.square(test_err)).mean(axis=-1))
+print("test RMSE:",  math.sqrt((np.square(test_err)).mean(axis=-1)))
+
+fig, axs = plt.subplots(2, 1)
+axs[0].plot(train_data , linewidth=1, label='real training data')
+axs[0].plot(y_train , linewidth=1, dashes=[6, 2], label='trianing prediction')
+axs[0].plot(train_err , linewidth=0.5, label='trianing error')
+axs[0].legend(loc='center right', bbox_to_anchor=(1.25, 0.5), ncol=1, fancybox=True, shadow=True)
+axs[0].set_xlabel("sample num")
+axs[0].set_ylabel('predicted value')
+axs[0].set_title('ENFN training phase, MSE:%1.5f' % (np.square(train_err)).mean(axis=-1))
+
+axs[1].plot(test_data, linewidth=1, label='real test data')
+axs[1].plot(y_test , linewidth=1, dashes=[6, 2], label='testing prediction')
+axs[1].plot(test_err , linewidth=0.5, label='testing error')
+axs[1].legend(loc='center right', bbox_to_anchor=(1.25, 0.5), ncol=1, fancybox=True, shadow=True)
+axs[1].set_title('ENFN testing phase, MSE:%1.5f' %(np.square(test_err)).mean(axis=-1))
+axs[1].set_xlabel("sample num")
+axs[1].set_ylabel('predicted value')
+fig.tight_layout()
+plt.show()
