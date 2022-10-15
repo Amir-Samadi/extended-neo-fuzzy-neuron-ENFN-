@@ -4,18 +4,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 import pandas as pd
-dataset_df = pd.read_excel("data.xlsx", index_col=0)
-data = dataset_df["data"]
+from sklearn import preprocessing
 
+dataset_df = pd.read_excel("MackeyGlass.xlsx", index_col=0)
+data = dataset_df["data"]
+normalized_df = (data-data.min())/(data.max()-data.min())
+data = normalized_df
+# 
 
 parser = argparse.ArgumentParser(description='extended neo fuzzy neuron')
 parser.add_argument('--membership_functions', type=int, default=6,
                         help='number of membership_functions (default: 3)')
 parser.add_argument('--membership_function_shape', type=str, default="triangular",
                         help='membership_function_shape, triangular,trapezoid,guassian,bell,sigmoid')
-parser.add_argument('--learning_rate', type=float, default=0.05,
+parser.add_argument('--learning_rate', type=float, default=0.9,
                     help='learning_rate, (default: 0.9)')
-parser.add_argument('--inference_order', type=int, default=1, metavar='G',
+parser.add_argument('--inference_order', type=int, default=2, metavar='G',
                     help='TSK inference_order (default: 0)')
 parser.add_argument('--history_length', type=int, default=6, metavar='G',
                     help='history_length (default: 10)')

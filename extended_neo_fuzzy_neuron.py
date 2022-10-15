@@ -22,7 +22,7 @@ class ENFN():
         mu = np.zeros(self.history_length * self.membership_functions * (self.inference_order + 1))
         sim = np.zeros(len(data))
         e = np.zeros(len(data))
-        r = 0
+        r = 1e-6
         #mean of membership_functions
         for k, input in enumerate(data): 
             for i, series in enumerate(input):
